@@ -1,6 +1,6 @@
-# Eurostat Data Cube
+#  <img src='logo.png' align="right" height="120px" /> Eurostat Data Cube 
 
-This is the inofficial way to access eurostat statistical data as a raster data cube, e.g. to .
+This is the inofficial way to access eurostat statistical data as a raster data cube.
 
 # Motivation
 
