@@ -1,0 +1,20 @@
+name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
+eurostat_datasets|stem|2e4b367ab129ed95|ae83e02145aed4b9|2c530c1562a7fbd1|-170642636||t20489.587632244s|s129326b|129326|rds|local|vector|||2.115|One or more parsing issues, call `problems()` on your data frame for details, e.g.:   dat <- vroom(...)   problems(dat)|
+datasets_e66873dfdf803da0|branch|d3122f5ec1ce92ef|64fd42ea408cc4c5|2c530c1562a7fbd1|1651879344||t20489.5932487794s|s103452b|103452|rds|local|vector|datasets||0.876||
+datasets_4b8f71f7aea2dc12|branch|b4cce36ba441b44a|64fd42ea408cc4c5|2c530c1562a7fbd1|-2069370574||t20489.6030171631s|s845688b|845688|rds|local|vector|datasets||2.764||
+classified_datasets_d802889d9f6ddd88|branch|fca47bce8691d2aa|ac3d2b6ed9e5063b|27b33b229df02f92|1641793766||t20489.6032513237s|s1973744b|1973744|rds|local|vector|classified_datasets||18.571||
+classified_datasets_994bca22525126c0|branch||ac3d2b6ed9e5063b|a4dda01f6bb06b28|-977025449||t20489.6032663804s||0|rds|local|vector|classified_datasets||0.718||ℹ In argument: `data = map(...)`. Caused by error in `map()`: ℹ In index: 1. Caused by error in `nuts_classify()` at _targets.R:59:15: ! Variable `geo` contains invalid NUTS codes. NUTS codes must start with two letters, followed by one (level 1) to three (level 3) alphanumeric characters, all uppercase. Invalid codes: EU27_2020
+raw_datasets_e66873dfdf803da0|branch|d3122f5ec1ce92ef|64fd42ea408cc4c5|2c530c1562a7fbd1|-1263743801||t20489.606099313s|s103452b|103452|rds|local|vector|raw_datasets||0.98||
+raw_datasets_4b8f71f7aea2dc12|branch|b4cce36ba441b44a|64fd42ea408cc4c5|2c530c1562a7fbd1|1465198175||t20489.6061307212s|s845688b|845688|rds|local|vector|raw_datasets||2.128||
+datasets_meta|stem|179b6232435a30ec|4feaf0532141ea98|2c530c1562a7fbd1|1578012520||t20489.6084703977s|s371b|371|rds|local|vector||datasets_meta_f13f8ff588c88a31*datasets_meta_abe6fe117e818fbc|2.237|One or more parsing issues, call `problems()` on your data frame for details, e.g.:   dat <- vroom(...)   problems(dat)|
+raw_datasets_65ca3ead74bdbfd2|branch|7c731f2bbf9fdd39|64fd42ea408cc4c5|2c530c1562a7fbd1|418025548||t20489.6084787888s|s4211b|4211|rds|local|vector|raw_datasets||0.684||
+raw_datasets|pattern|dde7e086d36dd65c|64fd42ea408cc4c5||2107175803||||4211|rds|local|vector||raw_datasets_e66873dfdf803da0*raw_datasets_65ca3ead74bdbfd2|0.684||
+classified_datasets_c1c49ce53b9e562f|branch|c1b81d37b260f19a|f252362efc1bb5a4|f4bca854d4f4f971|776140229||t20489.647838479s|s107555b|107555|rds|local|vector|classified_datasets||1.579||
+classified_datasets_b17a8a8b155d0903|branch|f2f2c2a61249c2ba|f252362efc1bb5a4|69ee57639b91375c|868616356||t20489.6478386129s|s177b|177|rds|local|vector|classified_datasets||0.003||
+classified_datasets|pattern|7bd97ae03cddeada|f252362efc1bb5a4||927574165||||107732|rds|local|vector||classified_datasets_c1c49ce53b9e562f*classified_datasets_b17a8a8b155d0903|1.582||
+stable_columns|object|ee6e6ef9c2407fd0
+.Random.seed|object|b7ac56d847c0e27e
+create_vars|function|ec85e6c19517230e
+datasets_c63ee599f97fafb6|branch|d06986a8ed7cc95c|de7630e96f968ac1|b67f13b969b1863c|352601955||t20489.6494004781s|s85107b|85107|rds|local|vector|datasets||1.805||
+datasets_34b9bd47dbdacb9e|branch|65d420b18dbe4410|de7630e96f968ac1|05da54c9a0f3cd1a|1672903380||t20489.6494010552s|s1959b|1959|rds|local|vector|datasets||0.013||
+datasets|pattern|4f2ee30f82acb830|de7630e96f968ac1||1070888297||||87066|rds|local|vector||datasets_c63ee599f97fafb6*datasets_34b9bd47dbdacb9e|1.818||
