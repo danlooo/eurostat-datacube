@@ -14,16 +14,9 @@ create_vars <- function(data, nuts_level, code) {
         distinct(var, geo, TIME_PERIOD, .keep_all = TRUE)
 }
 
-resample_space_to_nuts3 <- function(data, nuts3_regions, eurostat_regions) {
-    nuts_level <-
-        data |>
-        ungroup() |>
-        distinct(geo) |>
-        inner_join(eurostat_regions) |>
-        count(nut_level) |>
-        arrange(-n) |>
-        pull(nut_level) |>
-        first()
+resample_space_to_nuts3 <- function(data, nuts_codes) {
+    # assume data has only one NUTS level
+    nuts_level <- nchar(data$geo[[1]]) - 2
 
     if (nuts_level == 3) {
         # already at target resolution
@@ -33,7 +26,7 @@ resample_space_to_nuts3 <- function(data, nuts3_regions, eurostat_regions) {
         res <- mutate(data, geo2 = geo)
 
         res <-
-            nuts3_regions |>
+            nuts_codes |>
             select(geo2, geo3) |>
             filter(geo2 %in% res$geo2) |>
             left_join(res, by = "geo2") |>
@@ -45,7 +38,7 @@ resample_space_to_nuts3 <- function(data, nuts3_regions, eurostat_regions) {
         res <- mutate(data, geo0 = geo)
 
         res <-
-            nuts3_regions |>
+            nuts_codes |>
             select(geo0, geo3) |>
             filter(geo0 %in% res$geo0) |>
             left_join(res, by = "geo0") |>

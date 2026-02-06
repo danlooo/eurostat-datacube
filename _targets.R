@@ -9,6 +9,20 @@ source("lib.R")
 
 list(
   tar_target(
+    name = nuts_codes,
+    command = {
+      nuts::all_nuts_codes |>
+        filter(version == "2024" & nchar(code) == 5) |>
+        transmute(
+          geo3 = code,
+          geo2 = str_sub(code, 1, 4),
+          geo1 = str_sub(code, 1, 3),
+          geo0 = str_sub(code, 1, 2)
+        ) |>
+        arrange(geo3)
+    }
+  ),
+  tar_target(
     name = datasets_meta,
     command = {
       get_eurostat_toc() |>
@@ -100,6 +114,7 @@ list(
                   first() |>
                   create_vars(nuts_level = 0, code = cur_code) |>
                   resample_time_to_quarter() |>
+                  resample_space_to_nuts3(nuts_codes) |>
                   rename(value = values, time = TIME_PERIOD)
                 return(res)
               }
@@ -111,7 +126,8 @@ list(
                   weight = "pop21",
                   multiple_versions = "most_frequent"
                 ) |>
-                select(var, geo = to_code, time = TIME_PERIOD, value = values)
+                select(var, geo = to_code, time = TIME_PERIOD, value = values) |>
+                resample_space_to_nuts3(nuts_codes)
             }
           )
         )
