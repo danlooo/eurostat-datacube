@@ -189,13 +189,12 @@ list(
             select(-time) |>
             as.matrix()
 
-          message(dim(mat))
-
           fill_value <- 9.96921e36
           mat[is.na(mat)] <- fill_value
 
           var.def.nc(nc, cur_var, "NC_DOUBLE", c("time", "geo"))
-          att.put.nc(nc, cur_var, "missing_value", "NC_DOUBLE", fill_value)
+          att.put.nc(nc, cur_var, "_FillValue", "NC_DOUBLE", fill_value)
+          att.put.nc(nc, cur_var, "doi", "NC_CHAR", str_glue("https://doi.org/10.2908/{cur_code}"))
           var.put.nc(nc, cur_var, mat)
         }
       }
