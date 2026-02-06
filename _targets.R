@@ -24,6 +24,20 @@ list(
         arrange(geo3)
     }
   ),
+  tar_target(
+    name = nuts3_sf,
+    command = {
+      get_eurostat_geospatial(
+        output_class = "sf",
+        resolution = "20",
+        nuts_level = "3",
+        year = "2024"
+      ) |>
+        select(geo = id, name = NUTS_NAME, geometry) |>
+        filter(geo %in% geos) |>
+        arrange(geos)
+    }
+  ),
   # spatial data cube dimension
   tar_target(geos, nuts_codes$geo3),
   # temporal data cube dimension
