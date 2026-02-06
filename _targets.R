@@ -17,7 +17,7 @@ list(
             last.update.of.data,
             format = "%d.%m.%Y"
           )
-        ) %>%
+        ) |>
         filter(
           type != "folder" &
             last.update.of.data > as.Date("2020-01-01") &
