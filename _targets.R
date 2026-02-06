@@ -3,9 +3,11 @@ library(nuts)
 library(eurostat)
 library(sf)
 library(stars)
+library(RNetCDF)
 library(tidyverse)
 
 source("lib.R")
+Sys.setenv(HDF5_USE_FILE_LOCKING = FALSE)
 
 list(
   tar_target(
@@ -20,6 +22,17 @@ list(
           geo0 = str_sub(code, 1, 2)
         ) |>
         arrange(geo3)
+    }
+  ),
+  # spatial data cube dimension
+  tar_target(geos, nuts_codes$geo3),
+  # temporal data cube dimension
+  tar_target(
+    name = times,
+    command = {
+      expand_grid(year = 2012:2025, quarter = c("Q1", "Q2", "Q3", "Q4")) |>
+        unite(time, c(year, quarter), sep = "-") |>
+        pull(time)
     }
   ),
   tar_target(
@@ -131,6 +144,64 @@ list(
             }
           )
         )
+    }
+  ),
+  tar_target(
+    name = cube,
+    format = "file",
+    command = {
+      nc_path <- tar_path_target()
+      nc <- create.nc(nc_path, format = "netcdf4")
+
+      # Dimensions
+      dim.def.nc(nc, "time", length(times))
+      dim.def.nc(nc, "geo", length(geos))
+
+      # Variables
+      var.def.nc(nc, "time", "NC_STRING", "time")
+      var.def.nc(nc, "geo", "NC_STRING", "geo")
+
+      var.put.nc(nc, "time", times)
+      var.put.nc(nc, "geo", geos)
+
+      # fill data
+      for (cur_code in datasets$code) {
+        data <-
+          datasets |>
+          filter(code == cur_code) |>
+          pull(data) |>
+          first()
+
+        vars <- unique(data$var)
+
+        for (cur_var in vars) {
+          message(cur_var)
+
+          mat <-
+            data |>
+            filter(var == cur_var) |>
+            select(-var) |>
+            mutate(
+              geo = geo |> fct_relevel(geos),
+              time = time |> fct_relevel(times)
+            ) |>
+            pivot_wider(names_from = geo, values_from = value) |>
+            select(-time) |>
+            as.matrix()
+
+          message(dim(mat))
+
+          fill_value <- 9.96921e36
+          mat[is.na(mat)] <- fill_value
+
+          var.def.nc(nc, cur_var, "NC_DOUBLE", c("time", "geo"))
+          att.put.nc(nc, cur_var, "missing_value", "NC_DOUBLE", fill_value)
+          var.put.nc(nc, cur_var, mat)
+        }
+      }
+
+      close.nc(nc)
+      nc_path
     }
   )
 )
