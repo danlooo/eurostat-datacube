@@ -1,3 +1,5 @@
+set.seed(1337)
+
 stable_columns <- c("code", "freq", "unit", "geo", "TIME_PERIOD", "values")
 
 create_vars <- function(data, nuts_level, code) {
