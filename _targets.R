@@ -5,21 +5,7 @@ library(sf)
 library(stars)
 library(tidyverse)
 
-stable_columns <- c("code", "freq", "unit", "geo", "TIME_PERIOD", "values")
-
-create_vars <- function(data, nuts_level, code) {
-  data |>
-    filter(nchar(geo) - 2 == nuts_level) |>
-    mutate(cur_code = code) |>
-    select(cur_code, everything()) |>
-    unite(
-      var,
-      -any_of(setdiff(stable_columns, "cur_code")),
-      sep = "_"
-    ) |>
-    select(var, geo, TIME_PERIOD, values) |>
-    distinct(var, geo, TIME_PERIOD, .keep_all = TRUE)
-}
+source("lib.R")
 
 list(
   tar_target(
@@ -61,9 +47,10 @@ list(
       raw_datasets |>
         transmute(
           code,
-          data = map(
+          data = map2(
             data,
-            function(data) {
+            code,
+            function(data, code) {
               # discard aggregated data
               data <- filter(data, !str_starts(geo, "EU|EA|EEA"))
 
@@ -75,16 +62,19 @@ list(
                 return(tibble())
               }
 
-              data <- create_vars(data, nuts_level, code)
+              temp_agg_data <-
+                data |>
+                create_vars(nuts_level, code) |>
+                resample_time_to_quarter()
 
-              data |>
-                nuts_classify(
-                  nuts_code = "geo",
-                  group_vars = intersect(
-                    colnames(data),
-                    c("var", "freq", "unit", "TIME_PERIOD")
-                  )
+              nuts_classify(
+                temp_agg_data,
+                nuts_code = "geo",
+                group_vars = intersect(
+                  colnames(temp_agg_data),
+                  c("var", "unit", "TIME_PERIOD")
                 )
+              )
             }
           )
         )
@@ -109,6 +99,7 @@ list(
                   pull(data) |>
                   first() |>
                   create_vars(nuts_level = 0, code = cur_code) |>
+                  resample_time_to_quarter() |>
                   rename(value = values, time = TIME_PERIOD)
                 return(res)
               }
