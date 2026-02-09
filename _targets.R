@@ -11,7 +11,8 @@ source("lib.R")
 Sys.setenv(HDF5_USE_FILE_LOCKING = FALSE)
 
 tar_option_set(
-  controller = crew_controller_local(workers = 8)
+  controller = crew_controller_local(workers = 8),
+  error = "continue"
 )
 
 list(
