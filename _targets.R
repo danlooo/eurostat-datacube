@@ -1,4 +1,5 @@
 library(targets)
+library(crew)
 library(nuts)
 library(eurostat)
 library(sf)
@@ -8,6 +9,10 @@ library(tidyverse)
 
 source("lib.R")
 Sys.setenv(HDF5_USE_FILE_LOCKING = FALSE)
+
+tar_option_set(
+  controller = crew_controller_local(workers = 8)
+)
 
 list(
   tar_target(
