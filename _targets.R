@@ -69,7 +69,7 @@ list(
           type != "folder" &
             last.update.of.data > as.Date("2020-01-01") &
             values > 500 &
-            code %in% c("demo_r_find3", "teicp250")
+            code %in% selected_codes
         ) |>
         # enforce code to be unique
         select(-hierarchy) |>
