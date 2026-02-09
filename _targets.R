@@ -137,7 +137,7 @@ list(
           data = map2(
             code,
             data,
-            function(cur_code, data) {
+            possibly(function(cur_code, data) {
               if (is_empty(data)) {
                 # no conversion needed at country level
                 res <-
@@ -161,7 +161,7 @@ list(
                 ) |>
                 select(var, geo = to_code, time = TIME_PERIOD, value = values) |>
                 resample_space_to_nuts3(nuts_codes)
-            }
+            }, NA)
           )
         )
     }
@@ -192,19 +192,28 @@ list(
           pull(data) |>
           first()
 
+        if (!"tbl" %in% class(data)) {
+          next
+        }
+
+        grp <- grp.def.nc(nc, cur_code)
+
         vars <- unique(data$var)
 
         for (cur_var in vars) {
-          message(cur_var)
-
           mat <-
             data |>
-            filter(var == cur_var) |>
+            filter(
+              var == cur_var,
+              time %in% times,
+              geo %in% geos
+            ) |>
             select(-var) |>
             mutate(
-              geo = geo |> fct_relevel(geos),
-              time = time |> fct_relevel(times)
+              geo = geo |> factor(levels = geos),
+              time = time |> factor(levels = times)
             ) |>
+            complete(geo, time, fill = list(value = NA)) |>
             pivot_wider(names_from = geo, values_from = value) |>
             select(-time) |>
             as.matrix()
@@ -212,10 +221,10 @@ list(
           fill_value <- 9.96921e36
           mat[is.na(mat)] <- fill_value
 
-          var.def.nc(nc, cur_var, "NC_DOUBLE", c("time", "geo"))
-          att.put.nc(nc, cur_var, "_FillValue", "NC_DOUBLE", fill_value)
-          att.put.nc(nc, cur_var, "doi", "NC_CHAR", str_glue("https://doi.org/10.2908/{cur_code}"))
-          var.put.nc(nc, cur_var, mat)
+          var.def.nc(grp, cur_var, "NC_DOUBLE", c("time", "geo"))
+          att.put.nc(grp, cur_var, "_FillValue", "NC_DOUBLE", fill_value)
+          att.put.nc(grp, cur_var, "doi", "NC_CHAR", str_glue("https://doi.org/10.2908/{cur_code}"))
+          var.put.nc(grp, cur_var, mat)
         }
       }
 
