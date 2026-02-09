@@ -208,7 +208,7 @@ list(
               time %in% times,
               geo %in% geos
             ) |>
-            select(-var) |>
+            select(geo, time, value) |>
             mutate(
               geo = geo |> factor(levels = geos),
               time = time |> factor(levels = times)
