@@ -1,13 +1,6 @@
 set.seed(1337)
 
-stable_columns <- c("code", "freq", "unit", "geo", "TIME_PERIOD", "values")
-
-selected_codes <- c(
-    "nama_10r_3gdp", "nama_10r_3gva", "nama_10r_2gvagr",
-    "teicp010", "teicp250", "nama_10_nfa_bs",
-    "lfst_r_lfu3pers", "demo_r_d3dens", "ilc_li02", "ilc_di11", "edat_lfse_04",
-    "nama_10r_2gfcf", "nama_10r_2emhrw"
-)
+stable_columns <- c("code", "freq", "unit", "geo", "TIME_PERIOD", "values", "OBS_FLAG", "CONF_STATUS", "OBS_VALUE")
 
 create_vars <- function(data, nuts_level, code) {
     data |>
@@ -87,4 +80,41 @@ resample_time_to_quarter <- function(data, agg_func = mean) {
         return(res)
     }
     stop("freq value not implemented.")
+}
+
+get_var_meta <- function(cur_code, metabase) {
+    # see docs https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-detailed-guidelines/sdmx3-0/structure-queries
+    doc <-
+        str_glue(
+            "https://ec.europa.eu/eurostat/api/dissemination/sdmx/3.0/structure/",
+            "conceptscheme/ESTAT/{cur_code}?compress=false"
+        ) |>
+        read_xml()
+
+    concepts <- list()
+    names <- list()
+    for (concept in xml_find_all(doc, "//s:Concept")) {
+        id <- xml_attr(concept, "id")
+
+        if (id %in% stable_columns) {
+            next
+        }
+        name <- xml_find_first(concept, "c:Name[@xml:lang='en']") |> xml_text()
+        values <- metabase |>
+            filter(code == cur_code & name == id) |>
+            pull(value)
+
+        concepts[[id]] <- values
+        names[[id]] <- name
+    }
+    names <- enframe(names) |> unnest(value)
+    vars <- expand.grid(concepts) |> as_tibble()
+    vars <- bind_cols(vars |> unite(col = "var"), vars) |> mutate(var = paste0(cur_code, "_", var))
+    vars |>
+        mutate(
+            code = cur_code,
+            label = apply(vars, 1, function(row) {
+                paste(paste(names(vars)[names(vars) != "var"], row[names(vars) != "var"], sep = "="), collapse = ",")
+            })
+        )
 }

@@ -9,34 +9,6 @@
     ]
   },
   "Packages": {
-    "CFtime": {
-      "Package": "CFtime",
-      "Version": "1.7.2",
-      "Source": "Repository",
-      "Title": "Using CF-Compliant Calendars with Climate Projection Data",
-      "Authors@R": "person(\"Patrick\", \"Van Laake\", , \"patrick@vanlaake.net\", role = c(\"aut\", \"cre\", \"cph\"))",
-      "Description": "Support for all calendars as specified in the Climate and Forecast  (CF) Metadata Conventions for climate and forecasting data. The CF Metadata  Conventions is widely used for distributing files with climate observations  or projections, including the Coupled Model Intercomparison Project (CMIP)  data used by climate change scientists and the Intergovernmental Panel on Climate Change (IPCC). This package specifically allows the user to work  with any of the CF-compliant calendars (many of which are not compliant with  POSIXt). The CF time coordinate is formally defined in the CF Metadata  Conventions document available at <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.12/cf-conventions.html#time-coordinate>.",
-      "License": "MIT + file LICENSE",
-      "Encoding": "UTF-8",
-      "RoxygenNote": "7.3.3",
-      "Imports": [
-        "R6"
-      ],
-      "Suggests": [
-        "rmarkdown",
-        "testthat (>= 3.0.0)",
-        "stringr"
-      ],
-      "URL": "https://r-cf.github.io/CFtime/, https://github.com/R-CF/CFtime",
-      "BugReports": "https://github.com/R-CF/CFtime/issues",
-      "Config/testthat/edition": "3",
-      "Collate": "'api.R' 'CFCalendar.R' 'CFCalendar360.R' 'CFCalendar365.R' 'CFCalendar366.R' 'CFCalendarJulian.R' 'CFCalendarNone.R' 'CFCalendarProleptic.R' 'CFCalendarStandard.R' 'CFCalendarTAI.R' 'CFCalendarUTC.R' 'CFClimatology.R' 'CFtime-package.R' 'CFtime.R' 'helpers.R' 'zzz.R'",
-      "Config/Needs/website": "rmarkdown",
-      "NeedsCompilation": "no",
-      "Author": "Patrick Van Laake [aut, cre, cph]",
-      "Maintainer": "Patrick Van Laake <patrick@vanlaake.net>",
-      "Repository": "CRAN"
-    },
     "DBI": {
       "Package": "DBI",
       "Version": "1.2.3",
@@ -413,42 +385,6 @@
       "License": "MIT + file LICENSE",
       "NeedsCompilation": "no",
       "Author": "Tony Plate [aut, cre], Richard Heiberger [aut]",
-      "Repository": "CRAN"
-    },
-    "areal": {
-      "Package": "areal",
-      "Version": "0.1.8",
-      "Source": "Repository",
-      "Type": "Package",
-      "Title": "Areal Weighted Interpolation",
-      "Authors@R": "c( person(\"Christopher\", \"Prener\", , \"chris.prener@gmail.com\", c(\"aut\", \"cre\"), comment = c(ORCID = \"0000-0002-4310-9888\")), person(\"Charlie\",\"Revord\", , \"charlie.revord@slu.edu\", c(\"aut\")), person(\"Branson\", \"Fox\", ,\"branson.fox@slu.edu\", c(\"aut\"), comment = c(ORCID = \"0000-0002-4361-2811\")) )",
-      "Description": "A pipeable, transparent implementation of areal weighted interpolation with support for interpolating multiple variables in a single function call. These tools provide a full-featured workflow for validation and estimation that fits into both modern data management (e.g. tidyverse) and spatial  data (e.g. sf) frameworks.",
-      "Depends": [
-        "R (>= 3.4)"
-      ],
-      "License": "GPL-3",
-      "URL": "https://chris-prener.github.io/areal/",
-      "BugReports": "https://github.com/chris-prener/areal/issues",
-      "Encoding": "UTF-8",
-      "LazyData": "true",
-      "Imports": [
-        "dplyr",
-        "glue",
-        "purrr",
-        "rlang",
-        "sf"
-      ],
-      "RoxygenNote": "7.1.2",
-      "Suggests": [
-        "knitr",
-        "rmarkdown",
-        "testthat",
-        "covr"
-      ],
-      "VignetteBuilder": "knitr",
-      "NeedsCompilation": "no",
-      "Author": "Christopher Prener [aut, cre] (<https://orcid.org/0000-0002-4310-9888>), Charlie Revord [aut], Branson Fox [aut] (<https://orcid.org/0000-0002-4361-2811>)",
-      "Maintainer": "Christopher Prener <chris.prener@gmail.com>",
       "Repository": "CRAN"
     },
     "askpass": {
@@ -3159,80 +3095,6 @@
       "NeedsCompilation": "yes",
       "Author": "Charlie Gao [aut, cre] (ORCID: <https://orcid.org/0000-0002-0750-061X>), Posit Software, PBC [cph, fnd] (ROR: <https://ror.org/03wc8by49>), Hibiki AI Limited [cph], R Consortium [fnd]",
       "Maintainer": "Charlie Gao <charlie.gao@posit.co>",
-      "Repository": "CRAN"
-    },
-    "ncdfgeom": {
-      "Package": "ncdfgeom",
-      "Version": "1.1.6",
-      "Source": "Repository",
-      "Type": "Package",
-      "Title": "'NetCDF' Geometry and Time Series",
-      "Authors@R": "c(person(\"David\", \"Blodgett\", role = c(\"aut\", \"cre\"),  email = \"dblodgett@usgs.gov\"), person(\"Luke\", \"Winslow\", role = \"ctb\"))",
-      "Description": "Tools to create time series and geometry 'NetCDF' files.",
-      "URL": "https://code.usgs.gov/water/ncdfgeom",
-      "BugReports": "https://github.com/DOI-USGS/ncdfgeom/issues",
-      "Imports": [
-        "RNetCDF",
-        "ncmeta",
-        "sf",
-        "dplyr",
-        "methods",
-        "stars",
-        "areal"
-      ],
-      "Depends": [
-        "R (>= 3.5)"
-      ],
-      "Suggests": [
-        "testthat",
-        "knitr",
-        "rmarkdown",
-        "pkgdown",
-        "jsonlite",
-        "zip",
-        "ncdf4"
-      ],
-      "License": "CC0",
-      "Encoding": "UTF-8",
-      "VignetteBuilder": "knitr",
-      "RoxygenNote": "7.2.3",
-      "NeedsCompilation": "no",
-      "Author": "David Blodgett [aut, cre], Luke Winslow [ctb]",
-      "Maintainer": "David Blodgett <dblodgett@usgs.gov>",
-      "Repository": "CRAN"
-    },
-    "ncmeta": {
-      "Package": "ncmeta",
-      "Version": "0.4.0",
-      "Source": "Repository",
-      "Title": "Straightforward 'NetCDF' Metadata",
-      "Authors@R": "c(person(\"Michael\", \"Sumner\", email = \"mdsumner@gmail.com\", role = c(\"aut\", \"cre\")),  person(\"Tomas\", \"Remenyi\", role = \"ctb\"),  person(\"Ben\", \"Raymond\", role = \"ctb\"),  person(\"David\", \"Blodgett\", role = \"ctb\"),  person(\"Milton\", \"Woods\", role = \"ctb\"))",
-      "Description": "Extract metadata from 'NetCDF' data sources, these can be files, file handles or servers. This package leverages and extends the lower level functions of the 'RNetCDF' package  providing a consistent set of functions that all return data frames. We introduce named concepts  of 'grid', 'axis' and 'source' which are all meaningful entities without formal definition in the  'NetCDF' library <https://www.unidata.ucar.edu/software/netcdf/>. 'RNetCDF' matches the library  itself with only the named concepts of 'variables', 'dimensions' and 'attributes'.",
-      "Depends": [
-        "R (>= 3.3.0)"
-      ],
-      "License": "GPL-3",
-      "Encoding": "UTF-8",
-      "RoxygenNote": "7.3.0",
-      "Imports": [
-        "dplyr",
-        "rlang",
-        "RNetCDF",
-        "tibble",
-        "stats",
-        "tidyr",
-        "CFtime"
-      ],
-      "Suggests": [
-        "testthat",
-        "covr"
-      ],
-      "URL": "https://github.com/hypertidy/ncmeta, https://hypertidy.github.io/ncmeta/",
-      "BugReports": "https://github.com/hypertidy/ncmeta/issues",
-      "ByteCompile": "TRUE",
-      "NeedsCompilation": "no",
-      "Author": "Michael Sumner [aut, cre], Tomas Remenyi [ctb], Ben Raymond [ctb], David Blodgett [ctb], Milton Woods [ctb]",
-      "Maintainer": "Michael Sumner <mdsumner@gmail.com>",
       "Repository": "CRAN"
     },
     "nuts": {

@@ -6,6 +6,7 @@ library(sf)
 library(stars)
 library(RNetCDF)
 library(tidyverse)
+library(xml2)
 
 source("lib.R")
 Sys.setenv(HDF5_USE_FILE_LOCKING = FALSE)
@@ -56,6 +57,30 @@ list(
     }
   ),
   tar_target(
+    name = metabase,
+    command = {
+      read_tsv(
+        "https://ec.europa.eu/eurostat/api/dissemination/catalogue/metabase.txt.gz",
+        col_names = c("code", "name", "value")
+      )
+    }
+  ),
+  tar_target(
+    name = codes,
+    command = c(
+      "edat_lfse_04", "demo_r_d3dens"
+      # "nama_10r_3gdp", "nama_10r_3gva", "nama_10r_2gvagr",
+      # "teicp010", "teicp250", "nama_10_nfa_bs",
+      # "lfst_r_lfu3pers", "demo_r_d3dens", "ilc_li02", "ilc_di11", "edat_lfse_04",
+      # "nama_10r_2gfcf", "nama_10r_2emhrw"
+    ),
+  ),
+  tar_target(
+    name = variables_meta,
+    pattern = map(codes),
+    command = get_var_meta(codes, metabase)
+  ),
+  tar_target(
     name = datasets_meta,
     command = {
       get_eurostat_toc() |>
@@ -69,7 +94,7 @@ list(
           type != "folder" &
             last.update.of.data > as.Date("2020-01-01") &
             values > 500 &
-            code %in% selected_codes
+            code %in% codes
         ) |>
         # enforce code to be unique
         select(-hierarchy) |>
@@ -224,7 +249,7 @@ list(
           var.def.nc(grp, cur_var, "NC_DOUBLE", c("time", "geo"))
           att.put.nc(grp, cur_var, "_FillValue", "NC_DOUBLE", fill_value)
           att.put.nc(grp, cur_var, "doi", "NC_CHAR", str_glue("https://doi.org/10.2908/{cur_code}"))
-          var.put.nc(grp, cur_var, mat)
+          var.put.nc(gr, cur_var, mat)
         }
       }
 
