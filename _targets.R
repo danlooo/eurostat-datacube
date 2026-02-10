@@ -68,7 +68,7 @@ list(
   tar_target(
     name = codes,
     command = c(
-      "edat_lfse_04", "demo_r_d3dens"
+      "edat_lfse_04", "nama_10_nfa_bs"
       # "nama_10r_3gdp", "nama_10r_3gva", "nama_10r_2gvagr",
       # "teicp010", "teicp250", "nama_10_nfa_bs",
       # "lfst_r_lfu3pers", "demo_r_d3dens", "ilc_li02", "ilc_di11", "edat_lfse_04",
@@ -246,10 +246,18 @@ list(
           fill_value <- 9.96921e36
           mat[is.na(mat)] <- fill_value
 
+          long_name <- paste0(
+            datasets_meta |> filter(code == cur_code) |> pull(title) |> first() |> str_remove(" by.*$"),
+            " (",
+            variables_meta |> filter(var == cur_var) |> pull(label) |> first(),
+            ")"
+          )
+
           var.def.nc(grp, cur_var, "NC_DOUBLE", c("time", "geo"))
           att.put.nc(grp, cur_var, "_FillValue", "NC_DOUBLE", fill_value)
           att.put.nc(grp, cur_var, "doi", "NC_CHAR", str_glue("https://doi.org/10.2908/{cur_code}"))
-          var.put.nc(gr, cur_var, mat)
+          att.put.nc(grp, cur_var, "long_name", "NC_CHAR", long_name)
+          var.put.nc(grp, cur_var, mat)
         }
       }
 

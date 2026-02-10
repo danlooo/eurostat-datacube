@@ -1,6 +1,6 @@
 #  <img src='logo.png' align="right" height="120px" /> Eurostat Data Cube 
 
-This is your unnofficial data cube gateway to [eurostat](https://ec.europa.eu/eurostat/en/), allowing you to use census data in time series analyses and combine it with satellite imagery.
+This is your unnofficial data cube gateway to [eurostat](https://ec.europa.eu/eurostat/en/), allowing you to use temporal census data in [xarray](https://docs.xarray.dev/en/latest/index.html), e.g., to combine it with satellite imagery.
 
 ## Motivation
 
@@ -12,7 +12,8 @@ This project provides a harmonised and aggregated view on eurostat data, providi
 
 ## Features
 
-- bulk download of eurostat
+- follows xarray and [CF Conventions](https://cfconventions.org/)
+- bulk download of eurostat including meta data
 - All regions are aggregated or upsampled to NUTS3 as of version 2024
 - All timespans are aggregated or upsampled to quarters
 - Accounts for NUTS region splits and merges weighted by population using [nuts::nuts_convert_version](https://docs.ropensci.org/nuts/reference/nuts_convert_version.html)
