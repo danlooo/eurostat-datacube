@@ -14,6 +14,14 @@ stable_columns <- c(
 
 non_dim_columns <- setdiff(stable_columns, c("code", "freq", "unit"))
 
+harmonise_data <- function(data) {
+    if (!"unit" %in% colnames(data) && "currency" %in% colnames(data)) {
+        data <- data |> rename(unit = currency)
+    }
+
+    return(data)
+}
+
 #' Select columns sorted by name
 select_sorted <- function(data) {
     res <- data |> select(sort(names(data)))

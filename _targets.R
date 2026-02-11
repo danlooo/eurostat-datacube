@@ -86,6 +86,7 @@ list(
             bind_cols(
               # unlabeled data
               data |>
+                harmonise_data() |>
                 select(-c(geo, TIME_PERIOD, values)) |>
                 distinct() |>
                 select_sorted() |>
@@ -94,6 +95,7 @@ list(
                 mutate(var = map_chr(var, harmonise_var_name)),
               # group labeled data
               data |>
+                harmonise_data() |>
                 select(-c(geo, TIME_PERIOD, values)) |>
                 distinct() |>
                 select_sorted() |>
@@ -101,6 +103,7 @@ list(
                 unite("group", everything(), sep = " "),
               # labeled data
               data |>
+                harmonise_data() |>
                 select(-c(geo, TIME_PERIOD, values)) |>
                 distinct() |>
                 select_sorted() |>
@@ -166,6 +169,9 @@ list(
             data,
             code,
             function(data, code) {
+              # harmonise inconsistencies
+              data <- harmonise_data(data)
+
               # discard aggregated data
               data <- filter(data, !str_starts(geo, "EU|EA|EEA"))
 
@@ -214,6 +220,7 @@ list(
                     filter(code == cur_code) |>
                     pull(data) |>
                     first() |>
+                    harmonise_data() |>
                     create_vars(nuts_level = 0, code = cur_code) |>
                     resample_time_to_quarter() |>
                     resample_space_to_nuts3(nuts_codes) |>
@@ -309,7 +316,13 @@ list(
             deframe()
 
           for (attr_name in names(dim_attrs)) {
-            att.put.nc(grp, cur_var, attr_name, "NC_CHAR", dim_attrs[attr_name] |> as.character())
+            att.put.nc(
+              grp,
+              cur_var,
+              attr_name,
+              "NC_CHAR",
+              dim_attrs[attr_name] |> as.character()
+            )
           }
 
           long_name <- paste0(
