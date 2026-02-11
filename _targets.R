@@ -68,7 +68,8 @@ list(
   tar_target(
     name = codes,
     command = c(
-      "edat_lfse_04", "nama_10_nfa_bs"
+      "edat_lfse_04",
+      "nama_10_nfa_bs"
       # "nama_10r_3gdp", "nama_10r_3gva", "nama_10r_2gvagr",
       # "teicp010", "teicp250", "nama_10_nfa_bs",
       # "lfst_r_lfu3pers", "demo_r_d3dens", "ilc_li02", "ilc_di11", "edat_lfse_04",
@@ -77,8 +78,33 @@ list(
   ),
   tar_target(
     name = variables_meta,
-    pattern = map(codes),
-    command = get_var_meta(codes, metabase)
+    pattern = map(raw_datasets),
+    command = {
+      raw_datasets |>
+        mutate(
+          data = map2(code, data, function(cur_code, data) {
+            bind_cols(
+              # unlabeled data
+              data |>
+                select(-c(geo, TIME_PERIOD, values)) |>
+                distinct() |>
+                select_sorted() |>
+                select(freq, unit, everything()) |>
+                unite("var", everything()),
+              # labeled data
+              data |>
+                select(-c(geo, TIME_PERIOD, values)) |>
+                distinct() |>
+                select_sorted() |>
+                label_eurostat(fix_duplicated = TRUE)
+            ) |>
+              mutate(code = cur_code) |>
+              select(var, code, freq, unit, everything())
+          })
+        ) |>
+        pull(data) |>
+        reduce(full_join)
+    }
   ),
   tar_target(
     name = datasets_meta,
@@ -162,31 +188,39 @@ list(
           data = map2(
             code,
             data,
-            possibly(function(cur_code, data) {
-              if (is_empty(data)) {
-                # no conversion needed at country level
-                res <-
-                  raw_datasets |>
-                  filter(code == cur_code) |>
-                  pull(data) |>
-                  first() |>
-                  create_vars(nuts_level = 0, code = cur_code) |>
-                  resample_time_to_quarter() |>
-                  resample_space_to_nuts3(nuts_codes) |>
-                  rename(value = values, time = TIME_PERIOD)
-                return(res)
-              }
+            possibly(
+              function(cur_code, data) {
+                if (is_empty(data)) {
+                  # no conversion needed at country level
+                  res <-
+                    raw_datasets |>
+                    filter(code == cur_code) |>
+                    pull(data) |>
+                    first() |>
+                    create_vars(nuts_level = 0, code = cur_code) |>
+                    resample_time_to_quarter() |>
+                    resample_space_to_nuts3(nuts_codes) |>
+                    rename(value = values, time = TIME_PERIOD)
+                  return(res)
+                }
 
-              data |>
-                nuts_convert_version(
-                  to_version = "2024",
-                  variables = c("values" = "absolute"),
-                  weight = "pop21",
-                  multiple_versions = "most_frequent"
-                ) |>
-                select(var, geo = to_code, time = TIME_PERIOD, value = values) |>
-                resample_space_to_nuts3(nuts_codes)
-            }, NA)
+                data |>
+                  nuts_convert_version(
+                    to_version = "2024",
+                    variables = c("values" = "absolute"),
+                    weight = "pop21",
+                    multiple_versions = "most_frequent"
+                  ) |>
+                  select(
+                    var,
+                    geo = to_code,
+                    time = TIME_PERIOD,
+                    value = values
+                  ) |>
+                  resample_space_to_nuts3(nuts_codes)
+              },
+              NA
+            )
           )
         )
     }
@@ -247,7 +281,11 @@ list(
           mat[is.na(mat)] <- fill_value
 
           long_name <- paste0(
-            datasets_meta |> filter(code == cur_code) |> pull(title) |> first() |> str_remove(" by.*$"),
+            datasets_meta |>
+              filter(code == cur_code) |>
+              pull(title) |>
+              first() |>
+              str_remove(" by.*$"),
             " (",
             variables_meta |> filter(var == cur_var) |> pull(label) |> first(),
             ")"
@@ -255,7 +293,13 @@ list(
 
           var.def.nc(grp, cur_var, "NC_DOUBLE", c("time", "geo"))
           att.put.nc(grp, cur_var, "_FillValue", "NC_DOUBLE", fill_value)
-          att.put.nc(grp, cur_var, "doi", "NC_CHAR", str_glue("https://doi.org/10.2908/{cur_code}"))
+          att.put.nc(
+            grp,
+            cur_var,
+            "doi",
+            "NC_CHAR",
+            str_glue("https://doi.org/10.2908/{cur_code}")
+          )
           att.put.nc(grp, cur_var, "long_name", "NC_CHAR", long_name)
           var.put.nc(grp, cur_var, mat)
         }
