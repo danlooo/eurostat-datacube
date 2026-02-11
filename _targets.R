@@ -281,21 +281,30 @@ list(
           fill_value <- 9.96921e36
           mat[is.na(mat)] <- fill_value
 
-          browser()
+          var.def.nc(grp, cur_var, "NC_DOUBLE", c("time", "geo"))
+          att.put.nc(grp, cur_var, "_FillValue", "NC_DOUBLE", fill_value)
+          var.put.nc(grp, cur_var, mat)
+
+          dim_attrs <-
+            variables_meta |>
+            filter(var == cur_var) |>
+            pivot_longer(everything()) |>
+            filter(!is.na(value) & !name %in% c("var", "code")) |>
+            deframe()
+
+          for (attr_name in names(dim_attrs)) {
+            att.put.nc(grp, cur_var, attr_name, "NC_CHAR", dim_attrs[attr_name] |> as.character())
+          }
 
           long_name <- paste0(
             datasets_meta |>
               filter(code == cur_code) |>
               pull(title) |>
               first() |>
-              str_remove(" by.*$"),
-            " (",
-            variables_meta |> filter(var == cur_var) |> pull(label) |> first(),
-            ")"
+              str_remove(" by.*$")
           )
+          att.put.nc(grp, cur_var, "long_name", "NC_CHAR", long_name)
 
-          var.def.nc(grp, cur_var, "NC_DOUBLE", c("time", "geo"))
-          att.put.nc(grp, cur_var, "_FillValue", "NC_DOUBLE", fill_value)
           att.put.nc(
             grp,
             cur_var,
@@ -303,8 +312,6 @@ list(
             "NC_CHAR",
             str_glue("https://doi.org/10.2908/{cur_code}")
           )
-          att.put.nc(grp, cur_var, "long_name", "NC_CHAR", long_name)
-          var.put.nc(grp, cur_var, mat)
         }
       }
 
