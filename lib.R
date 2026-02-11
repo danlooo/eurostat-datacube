@@ -17,17 +17,23 @@ select_sorted <- function(data) {
     data |> select(sort(names(data)))
 }
 
+#' Harmonise variable name e.g. to be used as python variable name
+harmonise_var_name <- function(var) {
+    var |>
+        str_replace_all("[^A-z0-9]", "_") |>
+        str_to_lower()
+}
+
 create_vars <- function(data, nuts_level, code) {
     data |>
         filter(nchar(geo) - 2 == nuts_level) |>
         select_sorted() |>
-        mutate(cur_code = code) |>
-        select(cur_code, everything()) |>
         unite(
             var,
-            -any_of(setdiff(stable_columns, "cur_code")),
+            -any_of(stable_columns),
             sep = "_"
         ) |>
+        mutate(var = map_chr(var, harmonise_var_name)) |>
         select(var, geo, freq, TIME_PERIOD, values) |>
         distinct(var, geo, TIME_PERIOD, .keep_all = TRUE)
 }
