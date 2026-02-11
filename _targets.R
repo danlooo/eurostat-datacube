@@ -92,6 +92,13 @@ list(
                 select(freq, unit, everything()) |>
                 unite("var", everything()) |>
                 mutate(var = map_chr(var, harmonise_var_name)),
+              # group labeled data
+              data |>
+                select(-c(geo, TIME_PERIOD, values)) |>
+                distinct() |>
+                select_sorted() |>
+                select(-c(freq, unit)) |>
+                unite("group", everything(), sep = " "),
               # labeled data
               data |>
                 select(-c(geo, TIME_PERIOD, values)) |>
@@ -105,6 +112,15 @@ list(
         ) |>
         pull(data) |>
         reduce(full_join)
+    }
+  ),
+  tar_target(
+    name = variables_meta_file,
+    format = "file",
+    command = {
+      path <- tar_path_target()
+      write_csv(variables_meta, path)
+      path
     }
   ),
   tar_target(
@@ -302,7 +318,9 @@ list(
               filter(code == cur_code) |>
               pull(title) |>
               first() |>
-              str_remove(" by.*$")
+              str_remove(" by.*$"),
+            " in ",
+            dim_attrs["group"]
           )
           att.put.nc(grp, cur_var, "long_name", "NC_CHAR", long_name)
 
