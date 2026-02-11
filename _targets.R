@@ -274,7 +274,6 @@ list(
         }
 
         grp <- grp.def.nc(nc, cur_code)
-
         vars <- unique(data$var)
 
         for (cur_var in vars) {
@@ -323,6 +322,13 @@ list(
             dim_attrs["group"]
           )
           att.put.nc(grp, cur_var, "long_name", "NC_CHAR", long_name)
+
+          title <-
+            datasets_meta |>
+            filter(code == cur_code) |>
+            pull(title) |>
+            first()
+          att.put.nc(grp, cur_var, "title", "NC_CHAR", title)
 
           att.put.nc(
             grp,
