@@ -234,15 +234,16 @@ list(
       nc <- create.nc(nc_path, format = "netcdf4")
 
       # Dimensions
-      dim.def.nc(nc, "time", length(times))
       dim.def.nc(nc, "geo", length(geos))
-
-      # Variables
-      var.def.nc(nc, "time", "NC_STRING", "time")
       var.def.nc(nc, "geo", "NC_STRING", "geo")
-
-      var.put.nc(nc, "time", times)
       var.put.nc(nc, "geo", geos)
+
+      dim.def.nc(nc, "time", length(times))
+      var.def.nc(nc, "time", "NC_DOUBLE", "time")
+      cf_times <- map_int(times, ~ yq(.x) - as.Date("1970-01-01"))
+      var.put.nc(nc, "time", cf_times)
+      att.put.nc(nc, "time", "units", "NC_CHAR", "days since 1970-1-1 0:0:0")
+      att.put.nc(nc, "time", "long_name", "NC_CHAR", "time")
 
       # fill data
       for (cur_code in datasets$code) {
