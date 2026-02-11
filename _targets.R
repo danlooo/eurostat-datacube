@@ -90,7 +90,8 @@ list(
                 distinct() |>
                 select_sorted() |>
                 select(freq, unit, everything()) |>
-                unite("var", everything()),
+                unite("var", everything()) |>
+                mutate(var = map_chr(var, harmonise_var_name)),
               # labeled data
               data |>
                 select(-c(geo, TIME_PERIOD, values)) |>
