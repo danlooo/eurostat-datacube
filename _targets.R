@@ -281,6 +281,8 @@ list(
           fill_value <- 9.96921e36
           mat[is.na(mat)] <- fill_value
 
+          browser()
+
           long_name <- paste0(
             datasets_meta |>
               filter(code == cur_code) |>

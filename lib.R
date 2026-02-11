@@ -12,9 +12,19 @@ stable_columns <- c(
     "OBS_VALUE"
 )
 
+non_dim_columns <- setdiff(stable_columns, c("code", "freq", "unit"))
+
 #' Select columns sorted by name
 select_sorted <- function(data) {
-    data |> select(sort(names(data)))
+    res <- data |> select(sort(names(data)))
+
+    if ("unit" %in% colnames(data)) {
+        res <- res |> select(unit, everything())
+    }
+    if ("freq" %in% colnames(data)) {
+        res <- res |> select(freq, everything())
+    }
+    res
 }
 
 #' Harmonise variable name e.g. to be used as python variable name
@@ -28,13 +38,14 @@ create_vars <- function(data, nuts_level, code) {
     data |>
         filter(nchar(geo) - 2 == nuts_level) |>
         select_sorted() |>
+        mutate(freq2 = freq) |> # duplicate column e.g. for resample_time_to_quarter
         unite(
             var,
-            -any_of(stable_columns),
+            -any_of(non_dim_columns |> append("freq2")),
             sep = "_"
         ) |>
         mutate(var = map_chr(var, harmonise_var_name)) |>
-        select(var, geo, freq, TIME_PERIOD, values) |>
+        select(var, geo, freq = freq2, TIME_PERIOD, values) |>
         distinct(var, geo, TIME_PERIOD, .keep_all = TRUE)
 }
 
