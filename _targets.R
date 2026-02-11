@@ -68,12 +68,10 @@ list(
   tar_target(
     name = codes,
     command = c(
-      "edat_lfse_04",
-      "nama_10_nfa_bs"
-      # "nama_10r_3gdp", "nama_10r_3gva", "nama_10r_2gvagr",
-      # "teicp010", "teicp250", "nama_10_nfa_bs",
-      # "lfst_r_lfu3pers", "demo_r_d3dens", "ilc_li02", "ilc_di11", "edat_lfse_04",
-      # "nama_10r_2gfcf", "nama_10r_2emhrw"
+      "nama_10r_3gdp", "nama_10r_3gva", "nama_10r_2gvagr",
+      "teicp010", "teicp250", "nama_10_nfa_bs",
+      "lfst_r_lfu3pers", "demo_r_d3dens", "ilc_li02", "ilc_di11",
+      "nama_10r_2gfcf", "nama_10r_2emhrw" "edat_lfse_04",
     ),
   ),
   tar_target(
