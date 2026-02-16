@@ -51,7 +51,7 @@ list(
   tar_target(
     name = times,
     command = {
-      expand_grid(year = 2012:2025, quarter = c("Q1", "Q2", "Q3", "Q4")) |>
+      expand_grid(year = 2001:2021, quarter = c("Q1", "Q2", "Q3", "Q4")) |>
         unite(time, c(year, quarter), sep = "-") |>
         pull(time)
     }
@@ -76,7 +76,6 @@ list(
   ),
   tar_target(
     name = variables_meta,
-    pattern = map(raw_datasets),
     command = {
       raw_datasets |>
         mutate(
@@ -112,7 +111,8 @@ list(
           })
         ) |>
         pull(data) |>
-        reduce(full_join)
+        reduce(full_join) |>
+        left_join(variables_stats)
     }
   ),
   tar_target(
@@ -120,7 +120,10 @@ list(
     format = "file",
     command = {
       path <- tar_path_target()
-      write_csv(variables_meta, path)
+
+    variables_meta |>
+      filter(var %in% selected_variables) |>
+      write_csv(path)
       path
     }
   ),
@@ -248,6 +251,45 @@ list(
     }
   ),
   tar_target(
+    name = variables_stats,
+    pattern = map(datasets),
+    command = {
+      n_expected <- length(geos) * length(times) 
+
+      datasets |>
+        transmute(
+          code,
+          data = map(data, possibly(~ {
+            .x |>
+            group_by(var) |>
+            filter(geo %in% geos & time %in% times) |>
+            complete(geo) |>
+            select(geo, time, value) |>
+            mutate(
+              geo = geo |> factor(levels = geos),
+              time = time |> factor(levels = times),
+              value = is.na(value)
+            ) |>
+            complete(geo, time, fill = list(value = NA)) |> 
+            count(value) |>
+            filter(value == FALSE) |>
+            transmute(frac_na = 1 - (n / n_expected)) |>
+            ungroup()
+          }, NA))
+        ) |>
+        unnest(data) |>
+        select(-contains("data"))
+    }
+  ),
+  tar_target(
+    name = selected_variables,
+    command = {
+      variables_stats |>
+      filter(frac_na < 0.05) |>
+      pull(var)
+    } 
+  ),
+  tar_target(
     name = cube,
     format = "file",
     command = {
@@ -279,7 +321,7 @@ list(
         }
 
         grp <- grp.def.nc(nc, cur_code)
-        vars <- unique(data$var)
+        vars <- intersect(unique(data$var), selected_variables)
 
         for (cur_var in vars) {
           mat <-
@@ -308,7 +350,8 @@ list(
 
           dim_attrs <-
             variables_meta |>
-            filter(var == cur_var) |>
+            filter(var == cur_var) |> 
+            mutate(across(everything(), as.character)) |>
             pivot_longer(everything()) |>
             filter(!is.na(value) & !name %in% c("var", "code")) |>
             deframe()
