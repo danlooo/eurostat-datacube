@@ -28,6 +28,13 @@ cd eurostat-datacube
 docker compose up --build
 ```
 
+Alternatively , it can be excuted rootlessly using Apptainer/Singularity:
+
+```bash
+singularity run --bind $PWD/_targets:/work/_targets --workdir /work docker://danlooo/eurostat-datacube \
+    bash -c 'cd /work && R -e "targets::tar_make()"'
+```
+
 ## Disclaimer
 
 This project is a re-analysis of the official data of eurostat.
