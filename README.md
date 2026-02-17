@@ -18,6 +18,16 @@ This project provides a harmonised and aggregated view on eurostat data, providi
 - All timespans are aggregated or upsampled to quarters
 - Accounts for NUTS region splits and merges weighted by population using [nuts::nuts_convert_version](https://docs.ropensci.org/nuts/reference/nuts_convert_version.html)
 
+## Build
+
+This repo only contains the code required to build the actual datacube. To build your own, run:
+
+```bash
+git clone https://github.com/danlooo/eurostat-datacube
+cd eurostat-datacube
+docker compose up --build
+```
+
 ## Disclaimer
 
 This project is a re-analysis of the official data of eurostat.

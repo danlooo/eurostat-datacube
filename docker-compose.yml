@@ -1,0 +1,11 @@
+services:
+  eurostat-datacube:
+    image: danlooo/eurostat-datacube
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: eurostat-datacube
+    ports:
+      - "8787:8787"
+    volumes:
+      - ./_targets:/work/_targets
