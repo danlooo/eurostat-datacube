@@ -121,9 +121,9 @@ list(
     command = {
       path <- tar_path_target()
 
-    variables_meta |>
-      filter(var %in% selected_variables) |>
-      write_csv(path)
+      variables_meta |>
+        filter(var %in% selected_variables) |>
+        write_csv(path)
       path
     }
   ),
@@ -254,27 +254,27 @@ list(
     name = variables_stats,
     pattern = map(datasets),
     command = {
-      n_expected <- length(geos) * length(times) 
+      n_expected <- length(geos) * length(times)
 
       datasets |>
         transmute(
           code,
           data = map(data, possibly(~ {
             .x |>
-            group_by(var) |>
-            filter(geo %in% geos & time %in% times) |>
-            complete(geo) |>
-            select(geo, time, value) |>
-            mutate(
-              geo = geo |> factor(levels = geos),
-              time = time |> factor(levels = times),
-              value = is.na(value)
-            ) |>
-            complete(geo, time, fill = list(value = NA)) |> 
-            count(value) |>
-            filter(value == FALSE) |>
-            transmute(frac_na = 1 - (n / n_expected)) |>
-            ungroup()
+              group_by(var) |>
+              filter(geo %in% geos & time %in% times) |>
+              complete(geo) |>
+              select(geo, time, value) |>
+              mutate(
+                geo = geo |> factor(levels = geos),
+                time = time |> factor(levels = times),
+                value = is.na(value)
+              ) |>
+              complete(geo, time, fill = list(value = NA)) |>
+              count(value) |>
+              filter(value == FALSE) |>
+              transmute(frac_na = 1 - (n / n_expected)) |>
+              ungroup()
           }, NA))
         ) |>
         unnest(data) |>
@@ -285,9 +285,9 @@ list(
     name = selected_variables,
     command = {
       variables_stats |>
-      filter(frac_na < 0.05) |>
-      pull(var)
-    } 
+        filter(frac_na < 0.05) |>
+        pull(var)
+    }
   ),
   tar_target(
     name = cube,
@@ -320,8 +320,11 @@ list(
           next
         }
 
-        grp <- grp.def.nc(nc, cur_code)
         vars <- intersect(unique(data$var), selected_variables)
+
+        if (length(vars) > 0) {
+          grp <- grp.def.nc(nc, cur_code)
+        }
 
         for (cur_var in vars) {
           mat <-
@@ -350,7 +353,7 @@ list(
 
           dim_attrs <-
             variables_meta |>
-            filter(var == cur_var) |> 
+            filter(var == cur_var) |>
             mutate(across(everything(), as.character)) |>
             pivot_longer(everything()) |>
             filter(!is.na(value) & !name %in% c("var", "code")) |>
@@ -371,10 +374,11 @@ list(
               filter(code == cur_code) |>
               pull(title) |>
               first() |>
-              str_remove(" by.*$"),
-            " in ",
-            dim_attrs["group"]
+              str_remove(" by.*$")
           )
+          if (nchar(dim_attrs[["group"]]) > 0) {
+            long_name <- paste0(long_name, " in ", dim_attrs["group"])
+          }
           att.put.nc(grp, cur_var, "long_name", "NC_CHAR", long_name)
 
           title <-
